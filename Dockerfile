@@ -1,11 +1,15 @@
 # *******PYTHON BASE IMAGE*******
-FROM python:3.9.17-slim-bullseye as python
+FROM python:3.11-slim-bullseye as python
  
 # Run installation tasks as root
 USER root
 
 # Project folder name
 ARG PROJECT_FOLDER=/opt/rick-and-morty-elt
+
+# user/group id
+ARG UID=1000
+ARG GID=1000
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -14,7 +18,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Create user
-RUN useradd appuser
+RUN groupadd -g "${GID}" appuser \
+  && useradd --create-home --no-log-init -u "${UID}" -g "${GID}" appuser
 
 # Install pip requirements
 COPY ./requirements.txt ${PROJECT_FOLDER}/requirements.txt
