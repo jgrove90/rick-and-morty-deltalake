@@ -50,7 +50,7 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.6.2}
+  image: apache-airflow
   # build: .
   environment:
     &airflow-common-env
@@ -71,12 +71,14 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    #_PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-requirements.txt}
   volumes:
     - ./airflow/dags:/opt/airflow/dags
-    - ./airflow/logs:/opt/airflow/logs
+    - ./logs/airflow:/opt/logs/airflow
     - ./airflow/config:/opt/airflow/config
     - ./airflow/plugins:/opt/airflow/plugins
+    - ./src:/opt/airflow/src
+    - ./deltalake:/opt/airflow/deltalake
   user: "${AIRFLOW_UID}:0"
   depends_on:
     &airflow-common-depends-on
@@ -270,7 +272,7 @@ services:
       _PIP_ADDITIONAL_REQUIREMENTS: ''
     user: "0:0"
     volumes:
-      - ./airflow:/airflow
+      - .:/opt/rick-and-morty-deltalake
 
   airflow-cli:
     <<: *airflow-common
@@ -308,21 +310,6 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
-
-  python-app:
-      image: rick-and-morty-elt
-      container_name: python-app
-      hostname: python-app
-      tty: true
-      depends_on:
-        - airflow-init
-      build:
-        context: .
-        dockerfile: ./Dockerfile
-      ports:
-        - 8888:8888
-      volumes:
-        - .:/opt/rick-and-morty-elt
 
 volumes:
   postgres-db-volume:
