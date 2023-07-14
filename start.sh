@@ -1,4 +1,8 @@
 #!/bin/bash
 
-mkdir -p ./airflow/logs ./airflow/dags ./airflow/plugins ./airflow/config && \
-echo "AIRFLOW_UID=$(id -u)" > .env
+# mkdir -p ./logs/airflow ./airflow/dags ./airflow/plugins ./airflow/config && \
+# echo "AIRFLOW_UID=$(id -u)" > .env
+
+# build docker images
+# docker build --target python -t rick-and-morty-deltalake . && \
+docker build --target airflow -t apache-airflow . 

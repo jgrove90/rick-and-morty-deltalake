@@ -12,7 +12,7 @@ class Characters:
     origin: dict
     location: dict
     image: str
-    episode: list[str]
+    episode: List[str]
     url: str
     created: str
 
