@@ -17,6 +17,25 @@ class Characters:
     created: str
 
 @dataclass
+class Episode:
+    id: int
+    name: str
+    air_date: str
+    episode: str
+    characters: List[str]
+    url: str
+    created: str
+
+@dataclass
+class Location:
+    id: int
+    name: str
+    type: str
+    dimension: str
+    residents: List[str]
+    created: str
+
+@dataclass
 class Info:
     count: int
     pages: int
