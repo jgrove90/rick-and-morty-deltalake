@@ -33,6 +33,7 @@ class Location:
     type: str
     dimension: str
     residents: List[str]
+    url: str
     created: str
 
 @dataclass
