@@ -1,11 +1,14 @@
 import requests
 import data_classes as dc
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from typing import List
 
 BASE_URL = "https://rickandmortyapi.com/api"
 
 CHARACTER_ENDPOINT = "character"
+LOCATION_ENDPOINT = "location"
+EPISODE_ENDPOINT = "episode"
+
 
 # TODO add logging
 # TODO add try/except
@@ -23,38 +26,42 @@ class ApiRequest:
         response(): Sends an HTTP GET request to the endpoint and returns the JSON response.
         extractCharacterData(): Extracts character data from the JSON response.
     """
+
     def __init__(self, endpoint: str):
         self.endpoint = endpoint
-    
-    # TODO add logging
-    # TODO add try/except
-    def response(self) -> dict:
-        """
-        Sends an HTTP GET request to the endpoint and returns the JSON response.
-
-        Returns:
-            dict: The JSON response as a dictionary.
-        """
-        session = requests.Session()
-        return session.get(self.endpoint).json()
 
     # TODO add logging
     # TODO add try/except
-    def extractCharacterData(self) -> dc.Response:
+    def extractData(self, dataclass_name: dataclass) -> List[dict]:
         """
-        Extracts character data from the JSON response.
+        Extracts location data from the JSON response.
 
         Returns:
-            dc.Response: A dataclass Response object containing character data,
-                         or None if no character data is available.
+            dc.Response: A dataclass Response object containing location data,
+                         or None if no location data is available.
         """
-        response = self.response()
-        character_data = response.get("results")
+        data = []
 
-        # pass dataclass
-        if character_data:
-            characters = [dc.Characters(**item) for item in character_data]
-            info = dc.Info(**response.get("info"))
-            return dc.Response(info=info, results=characters)
-        else:
-            return None
+        # start of pagination (updates with every loop)
+        next_url = self.endpoint
+
+        while next_url:
+            response = requests.Session().get(next_url).json()
+            results = response.get("results")
+
+            if results:
+                dataclass_results = [dataclass_name(**item) for item in results]
+                dataclass_info = dc.Info(**response.get("info"))
+                dataclass_response = dc.Response(
+                    info=dataclass_info, results=dataclass_results
+                )
+
+                next_url = dataclass_response.info.next
+
+                for result in dataclass_response.results:
+                    result_dict = asdict(result)
+                    data.append(result_dict)
+            else:
+                None
+
+        return data or None
