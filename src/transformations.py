@@ -23,7 +23,7 @@ class Transformations:
             self.data.drop(columns=["episode"])
             .assign(origin=self.data.origin.apply(lambda _df: getID(_df)))
             .assign(location=self.data.location.apply(lambda _df: getID(_df)))
-            .assign(created=self.data.created.apply(lambda _df: dateTimeParse(_df)))
+            .assign(created=self.data.created.apply(lambda _df: dateTimeFormat(_df)))
             .astype({"origin": pd.Int64Dtype(), "location": pd.Int64Dtype()})
             .rename(columns={"origin": "origin_id", "location": "location_id"})
         )
@@ -35,7 +35,7 @@ class Transformations:
 
     def silverLocation(self):
         df = self.data.assign(
-            created=self.data.created.apply(lambda _df: dateTimeParse(_df))
+            created=self.data.created.apply(lambda _df: dateTimeFormat(_df))
         )
         return df
 
@@ -45,7 +45,7 @@ class Transformations:
 
     def silverEpisode(self):
         df = self.data.assign(
-            air_date=self.data.air_date.apply(lambda _df: dateParse(_df)),
-            created=self.data.created.apply(lambda _df: dateTimeParse(_df))
+            air_date=self.data.air_date.apply(lambda _df: dateFormat(_df)),
+            created=self.data.created.apply(lambda _df: dateTimeFormat(_df))
         )
         return df
