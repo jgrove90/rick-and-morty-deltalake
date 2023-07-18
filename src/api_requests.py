@@ -46,18 +46,22 @@ class ApiRequest:
         next_url = self.endpoint
 
         while next_url:
+            # makes request
             response = requests.Session().get(next_url).json()
             results = response.get("results")
 
             if results:
+                # passes JSON to dataclasess
                 dataclass_results = [dataclass_name(**item) for item in results]
                 dataclass_info = dc.Info(**response.get("info"))
                 dataclass_response = dc.Response(
-                    info=dataclass_info, results=dataclass_results
+                    info=dataclass_info, results=dataclass_results 
                 )
 
+                # sets the next_url from current request
                 next_url = dataclass_response.info.next
 
+                # appends data to list
                 for result in dataclass_response.results:
                     result_dict = asdict(result)
                     data.append(result_dict)
