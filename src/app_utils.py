@@ -32,14 +32,16 @@ def getID(data: dict | np.ndarray) -> int:
         return None
 
 
-def dateTimeFormat(date: str):
-    datetime_format = "%Y-%m-%dT%H:%M:%S.%fZ"
-    datetime_obj = datetime.strptime(date, datetime_format)
-    return datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+def dateTimeFormat(date: str) -> str:
+    date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+    date_format = "%B %d, %Y"
 
-
-def dateFormat(date: str):
-    datetime_format = "%B %d, %Y"
-    datetime_obj = datetime.strptime(date, datetime_format)
-    return datetime_obj.strftime("%Y-%m-%d")
-
+    try:
+        datetime_obj = datetime.strptime(date, date_time_format)
+        return datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        try:
+            datetime_obj = datetime.strptime(date, date_format)
+            return datetime_obj.strftime("%Y-%m-%d")
+        except ValueError:
+            raise ValueError("Invalid date format")
