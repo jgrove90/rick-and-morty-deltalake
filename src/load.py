@@ -1,18 +1,19 @@
 import deltalake as dl
 from pyarrow import Schema
 
+BASE_PATH = "./deltalake/rick_and_morty"
 
-BRONZE_CHARACTERS_TABLE = "./deltalake/rick_and_morty/bronze/character"
-SILVER_CHARACTERS_TABLE = "./deltalake/rick_and_morty/silver/character"
-GOLD_CHARACTERS_TABLE = "./deltalake/rick_and_morty/gold/character"
+BRONZE_CHARACTER_TABLE = f"{BASE_PATH}/bronze/character"
+SILVER_CHARACTER_TABLE = f"{BASE_PATH}/silver/character"
+GOLD_CHARACTER_TABLE = f"{BASE_PATH}/gold/character"
 
-BRONZE_LOCATION_TABLE = "./deltalake/rick_and_morty/bronze/location"
-SILVER_LOCATION_TABLE = "./deltalake/rick_and_morty/silver/location"
-GOLD_LOCATION_TABLE = "./deltalake/rick_and_morty/gold/location"
+BRONZE_LOCATION_TABLE = f"{BASE_PATH}/bronze/location"
+SILVER_LOCATION_TABLE = f"{BASE_PATH}/silver/location"
+GOLD_LOCATION_TABLE = f"{BASE_PATH}/gold/location"
 
-BRONZE_EPISODE_TABLE = "./deltalake/rick_and_morty/bronze/episode"
-SILVER_EPISODE_TABLE = "./deltalake/rick_and_morty/silver/episode"
-GOLD_EPISODE_TABLE = "./deltalake/rick_and_morty/gold/episode"
+BRONZE_EPISODE_TABLE = f"{BASE_PATH}/bronze/episode"
+SILVER_EPISODE_TABLE = f"{BASE_PATH}/silver/episode"
+GOLD_EPISODE_TABLE = f"{BASE_PATH}/gold/episode"
 
 class DeltaTableManager:
     def __init__(self, dataframe):
