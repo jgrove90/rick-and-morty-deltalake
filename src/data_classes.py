@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 @dataclass
-class Characters:
+class Character:
     id: int
     name: str
     status: str
@@ -46,4 +46,4 @@ class Info:
 @dataclass
 class Response:
     info: Info
-    results: List[Characters]
+    results: List[Character]
