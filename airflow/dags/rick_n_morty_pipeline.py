@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from airflow.decorators import task, dag
+from airflow.utils.task_group import TaskGroup
 import sys
 
 sys.path.append("/opt/airflow/src")
@@ -41,30 +42,95 @@ def rick_and_morty_character_pipeline():
             raise ValueError("API not reached! Service may be down.")
 
 
-    @task()
-    def extractCharacterData():
-        character_data = ApiRequest(BASE_URL/CHARACTER_ENDPOINT).extractData(Character)
-        df_bronze_character = Transformation(character_data).bronzeCharacter()
-        return df_bronze_character
-    
-    @task()
-    def loadCharacterData(dataframe: DataFrame):
-        DeltaTableManager(dataframe).writeToDeltaLake(BRONZE_CHARACTER_TABLE)
+    with TaskGroup('extractBronzeData') as bronze_group:
+        # character
+        @task()
+        def extractCharacterData():
+            character_data = ApiRequest(BASE_URL/CHARACTER_ENDPOINT).extractData(Character)
+            return Transformation(character_data).Character().bronze()
         
-    @task()
-    def silverTransformCharacterData():
-        # silver_data
-        bronze_character_data = DeltaTable(BRONZE_CHARACTER_TABLE).to_pandas()
-        df_silver_character = Transformation(bronze_character_data).silverCharacter()
-        DeltaTableManager(df_silver_character).writeToDeltaLake(SILVER_CHARACTER_TABLE)
+        @task()
+        def loadCharacterData(dataframe: DataFrame):
+            DeltaTableManager(dataframe).writeToDeltaLake(BRONZE_CHARACTER_TABLE)
+        
+        # location
+        @task()
+        def extractLocationData():
+            location_data = ApiRequest(BASE_URL/LOCATION_ENDPOINT).extractData(Location) 
+            return Transformation(location_data).Location().bronze()
+        
+        @task()
+        def loadLocationData(dataframe: DataFrame):
+            DeltaTableManager(dataframe).writeToDeltaLake(BRONZE_LOCATION_TABLE)
+
+        # episode
+        @task()
+        def extractEpisodeData():
+            episode_data = ApiRequest(BASE_URL/EPISODE_ENDPOINT).extractData(Episode) 
+            return Transformation(episode_data).Episode().bronze()
+        
+        @task()
+        def loadEpisodeData(dataframe: DataFrame):
+            DeltaTableManager(dataframe).writeToDeltaLake(BRONZE_EPISODE_TABLE)
+
+        loadCharacterData(extractCharacterData())
+        loadLocationData(extractLocationData())
+        loadEpisodeData(extractEpisodeData())
     
-    @task
-    def goldTransformCharacterData():
-        # silver_data
-        silver_character_data = DeltaTable(SILVER_CHARACTER_TABLE).to_pandas()
-        df_silver_character = Transformation(silver_character_data).goldCharacter()
-        DeltaTableManager(df_silver_character).writeToDeltaLake(GOLD_CHARACTER_TABLE)
+        
+    with TaskGroup('transformSilverData') as silver_group:        
+        @task()
+        def silverTransformCharacterData():
+            bronze_character_data = DeltaTable(BRONZE_CHARACTER_TABLE).to_pandas()
+            df_silver_character = Transformation(bronze_character_data).Character().silver()
+            DeltaTableManager(df_silver_character).writeToDeltaLake(SILVER_CHARACTER_TABLE)
 
-    checkAPIRepsonse() >> loadCharacterData(extractCharacterData()) >> [silverTransformCharacterData() >> goldTransformCharacterData()]
+        @task()
+        def silverTransformLocationData():
+            bronze_location_data = DeltaTable(BRONZE_LOCATION_TABLE).to_pandas()
+            df_silver_location = Transformation(bronze_location_data).Location().silver()
+            DeltaTableManager(df_silver_location).writeToDeltaLake(SILVER_LOCATION_TABLE)
 
+        @task()
+        def silverTransformEpisodeData():
+            bronze_episode_data = DeltaTable(BRONZE_EPISODE_TABLE).to_pandas()
+            df_silver_episode = Transformation(bronze_episode_data).Episode().silver()
+            DeltaTableManager(df_silver_episode).writeToDeltaLake(SILVER_EPISODE_TABLE)
+
+        silverTransformCharacterData()
+        silverTransformLocationData()
+        silverTransformEpisodeData()
+
+
+    with TaskGroup('transformGoldData') as gold_group:        
+        @task()
+        def goldTransformCharacterData():
+            silver_character_data = DeltaTable(SILVER_CHARACTER_TABLE).to_pandas()
+            df_gold_character = Transformation(silver_character_data).Character().gold()
+            DeltaTableManager(df_gold_character).writeToDeltaLake(GOLD_CHARACTER_TABLE)
+
+        @task()
+        def goldTransformLocationData():
+            silver_location_data = DeltaTable(SILVER_LOCATION_TABLE).to_pandas()
+            df_gold_location = Transformation(silver_location_data).Location().gold()
+            DeltaTableManager(df_gold_location).writeToDeltaLake(GOLD_LOCATION_TABLE)
+
+        @task()
+        def goldTransformEpisodeData():
+            silver_episode_data = DeltaTable(SILVER_EPISODE_TABLE).to_pandas()
+            df_gold_episode = Transformation(silver_episode_data).Episode().gold()
+            DeltaTableManager(df_gold_episode).writeToDeltaLake(GOLD_EPISODE_TABLE)
+
+        goldTransformCharacterData()
+        goldTransformLocationData()
+        goldTransformEpisodeData()
+
+        @task()
+        def updateFactTable():
+            fact_table = Transformation.factTable()
+            DeltaTableManager(fact_table).writeToDeltaLake(FACT_TABLE)
+    
+
+    checkAPIRepsonse() >> bronze_group >> silver_group >> gold_group >> updateFactTable()
+    
 rick_and_morty_character_pipeline()
