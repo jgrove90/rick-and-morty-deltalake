@@ -15,6 +15,8 @@ BRONZE_EPISODE_TABLE = f"{BASE_PATH}/bronze/episode"
 SILVER_EPISODE_TABLE = f"{BASE_PATH}/silver/episode"
 GOLD_EPISODE_TABLE = f"{BASE_PATH}/gold/episode"
 
+FACT_TABLE = f"{BASE_PATH}/gold/fact"
+
 class DeltaTableManager:
     def __init__(self, dataframe):
         self.dataframe = dataframe
