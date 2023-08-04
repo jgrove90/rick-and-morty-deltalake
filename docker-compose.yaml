@@ -74,11 +74,11 @@ x-airflow-common:
     #_PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-requirements.txt}
   volumes:
     - ./airflow/dags:/opt/airflow/dags
-    - ./logs/airflow:/opt/logs/airflow
+    - ./airflow/logs:/opt/airflow/logs
     - ./airflow/config:/opt/airflow/config
     - ./airflow/plugins:/opt/airflow/plugins
     - ./src:/opt/airflow/src
-    - ./deltalake:/opt/airflow/deltalake
+    - ./deltalake:/opt/rick-and-morty-elt/deltalake
   user: "${AIRFLOW_UID}:0"
   depends_on:
     &airflow-common-depends-on
