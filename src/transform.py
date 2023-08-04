@@ -5,74 +5,76 @@ from deltalake import DeltaTable
 from load import *
 
 
-# TODO add logging
 # TODO add doc string
-class Transformation:
+class CharacterTransformation:
     def __init__(self, data: List[dict] | pd.DataFrame):
         self.data = data
 
-    def createDataFrame(self) -> DataFrame:
-        df = createDataFrame(self.data)
+    def bronze(self):
+        df = createDataFrame(self.data).drop(columns=["type", "url"])
         return df
 
-    class Character:
-        def bronze(self):
-            df = self.createDataFrame().drop(columns=["type", "url"])
-            return df
+    def silver(self):
+        df = (
+            self.data.drop(columns=["episode"])
+            .assign(origin=self.data.origin.apply(lambda _df: getID(_df)))
+            .assign(location=self.data.location.apply(lambda _df: getID(_df)))
+            .assign(created=self.data.created.apply(lambda _df: dateTimeFormat(_df)))
+            .astype({"origin": pd.Int64Dtype(), "location": pd.Int64Dtype()})
+            .rename(columns={"origin": "origin_id", "location": "location_id"})
+        )
+        return df
 
-        def silver(self):
-            df = (
-                self.data.drop(columns=["episode"])
-                .assign(origin=self.data.origin.apply(lambda _df: getID(_df)))
-                .assign(location=self.data.location.apply(lambda _df: getID(_df)))
-                .assign(
-                    created=self.data.created.apply(lambda _df: dateTimeFormat(_df))
-                )
-                .astype({"origin": pd.Int64Dtype(), "location": pd.Int64Dtype()})
-                .rename(columns={"origin": "origin_id", "location": "location_id"})
-            )
-            return df
+    def gold(self):
+        df = self.data.drop(columns=["origin_id", "location_id", "created"]).rename(
+            columns={"id": "char_id"}
+        )
+        return df
 
-        def gold(self):
-            df = self.data.drop(columns=["origin_id", "location_id", "created"]).rename(
-                columns={"id": "char_id"}
-            )
-            return df
 
-    class Location:
-        def bronze(self):
-            df = self.createDataFrame().drop(columns=["residents", "url"])
-            return df
+class LocationTransformation:
+    def __init__(self, data: List[dict] | pd.DataFrame):
+        self.data = data
 
-        def silver(self):
-            df = self.data.assign(
-                created=self.data.created.apply(lambda _df: dateTimeFormat(_df))
-            )
-            return df
+    def bronze(self):
+        df = createDataFrame(self.data).drop(columns=["residents", "url"])
+        return df
 
-        def gold(self):
-            df = self.data.drop(columns=["created"]).rename(columns={"id": "loc_id"})
-            return df
+    def silver(self):
+        df = self.data.assign(
+            created=self.data.created.apply(lambda _df: dateTimeFormat(_df))
+        )
+        return df
 
-    class Episode:
-        def bronze(self):
-            df = self.createDataFrame().drop(columns="url")
-            return df
+    def gold(self):
+        df = self.data.drop(columns=["created"]).rename(columns={"id": "loc_id"})
+        return df
 
-        def silver(self):
-            df = self.data.assign(
-                air_date=self.data.air_date.apply(lambda _df: dateTimeFormat(_df)),
-                created=self.data.created.apply(lambda _df: dateTimeFormat(_df)),
-            )
-            return df
 
-        def gold(self):
-            df = self.data.drop(columns=["characters", "created"]).rename(
-                columns={"id": "ep_id"}
-            )
-            return df
+class EpisodeTransformation:
+    def __init__(self, data: List[dict] | pd.DataFrame):
+        self.data = data
 
-    def factTable(self):
+    def bronze(self):
+        df = createDataFrame(self.data).drop(columns="url")
+        return df
+
+    def silver(self):
+        df = self.data.assign(
+            air_date=self.data.air_date.apply(lambda _df: dateTimeFormat(_df)),
+            created=self.data.created.apply(lambda _df: dateTimeFormat(_df)),
+        )
+        return df
+
+    def gold(self):
+        df = self.data.drop(columns=["characters", "created"]).rename(
+            columns={"id": "ep_id"}
+        )
+        return df
+
+
+class DataModel:
+    def factTable():
         ep_data = DeltaTable(SILVER_EPISODE_TABLE).to_pandas()
         char_data = DeltaTable(SILVER_CHARACTER_TABLE).to_pandas()
 
