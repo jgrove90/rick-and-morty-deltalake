@@ -79,6 +79,7 @@ x-airflow-common:
     - ./airflow/plugins:/opt/airflow/plugins
     - ./src:/opt/airflow/src
     - ./deltalake:/opt/rick-and-morty-elt/deltalake
+    - ./csv_data:/opt/rick-and-morty-elt/csv_data
   user: "${AIRFLOW_UID}:0"
   depends_on:
     &airflow-common-depends-on
