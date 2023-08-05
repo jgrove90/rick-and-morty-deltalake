@@ -156,6 +156,7 @@ cython_debug/
 /airflow/logs/*
 *.json
 /deltalake/*
+/csv_data/*
 
 
 
