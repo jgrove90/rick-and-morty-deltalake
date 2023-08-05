@@ -17,14 +17,31 @@ GOLD_EPISODE_TABLE = f"{BASE_PATH}/gold/episode"
 
 FACT_TABLE = f"{BASE_PATH}/gold/fact"
 
+
 class DeltaTableManager:
+    """
+    A utility class for managing Delta Lake tables.
+    """
+
     def __init__(self, dataframe):
         self.dataframe = dataframe
 
     def getSchema(self) -> Schema:
+        """
+        Get the schema of the managed DataFrame.
+
+        Returns:
+        Schema: The schema of the managed DataFrame.
+        """
         return Schema.from_pandas(self.dataframe)
 
-    def writeToDeltaLake(self, path: str) -> None:
+    def writeToDeltaLake(self, path: str):
+        """
+        Write the managed DataFrame to a Delta Lake table.
+
+        Parameters:
+        path (str): The path where the Delta Lake table will be written.
+        """
         dl.write_deltalake(
             path, self.dataframe, schema=self.getSchema(), mode="overwrite"
         )
