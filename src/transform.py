@@ -82,20 +82,10 @@ class DataModel:
             ep_data.assign(characters=ep_data.characters.apply(lambda _df: getID(_df)))
             .explode("characters")
             .rename(columns={"characters": "char_id", "id": "ep_id"})
-            .join(char_data.set_index("id"), on="char_id", lsuffix="_")
-            .drop(
-                columns=[
-                    "name",
-                    "air_date",
-                    "episode",
-                    "created",
-                    "name_",
-                    "status",
-                    "species",
-                    "gender",
-                    "image",
-                    "created_",
-                ]
-            )
+            .join(char_data.set_index("id"), on="char_id", lsuffix="_")[
+                ["ep_id", "char_id", "origin_id", "location_id"]
+            ]
+            # removes column __index_level_0__
+            .reset_index(drop=True)
         )
         return fact_table
