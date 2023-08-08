@@ -57,9 +57,8 @@ def rick_and_morty_pipeline():
         return load_data(extract_data())
 
     def transform_and_load_silver_data(bronze_table, silver_table):
-        lable = bronze_table.split("/")[-1].capitalize()
-
-        @task(task_id=f"Transform_{lable}")
+        label = bronze_table.split("/")[-1].capitalize()
+        @task(task_id=f"Transform_{label}")
         def transform_data():
             bronze_data = DeltaTable(bronze_table).to_pandas()
 
@@ -76,16 +75,16 @@ def rick_and_morty_pipeline():
                 DeltaTableManager(df_silver_data).writeToDeltaLake(silver_table)
                 return df_silver_data
 
-        @task(task_id=f"Load_{lable}")
+        @task(task_id=f"Load_{label}")
         def load_data(dataframe: DataFrame):
             DeltaTableManager(dataframe).writeToDeltaLake(silver_table)
 
         return load_data(transform_data())
 
     def transform_and_load_gold_data(silver_table, gold_table):
-        lable = silver_table.split("/")[-1].capitalize()
+        label = silver_table.split("/")[-1].capitalize()
 
-        @task(task_id=f"Transform_{lable}")
+        @task(task_id=f"Transform_{label}")
         def transform_data():
             silver_data = DeltaTable(silver_table).to_pandas()
             if silver_table == SILVER_CHARACTER_TABLE:
@@ -98,21 +97,21 @@ def rick_and_morty_pipeline():
                 df_gold_data = EpisodeTransformation(silver_data).gold()
                 return df_gold_data
 
-        @task(task_id=f"Load_{lable}")
+        @task(task_id=f"Load_{label}")
         def load_data(dataframe: DataFrame):
             DeltaTableManager(dataframe).writeToDeltaLake(gold_table)
 
         return load_data(transform_data())
 
     def create_data_model(gold_table: str):
-        lable = gold_table.split("/")[-1].capitalize()
+        label = gold_table.split("/")[-1].capitalize()
 
-        @task(task_id=f"{lable}")
+        @task(task_id=f"{label}")
         def insert_fact_table():
             fact_table = DataModel.factTable()
             return fact_table
 
-        @task(task_id=f"Load_{lable}")
+        @task(task_id=f"Load_{label}")
         def load_data(dataframe: DataFrame):
             DeltaTableManager(dataframe).writeToDeltaLake(gold_table)
 
