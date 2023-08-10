@@ -2,7 +2,7 @@
 FROM apache/airflow:2.6.3-python3.11 as airflow
 
 # Project folder name
-ARG PROJECT_FOLDER=/opt/rick-and-morty-elt
+ARG PROJECT_FOLDER=/opt/rick-and-morty-deltalake
 
 # user/group id
 ARG UID=1000
