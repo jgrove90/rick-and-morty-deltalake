@@ -56,5 +56,8 @@ echo "AIRFLOW_UID=$(id -u)" > .env
 echo " - .env created successfully!"
 
 # ***DOCKER BUILD
-docker build --target python -t rick-and-morty-deltalake . && \
-docker build --target airflow -t apache-airflow . 
+docker build --target airflow -t apache-airflow .
+
+# start containers
+docker compose up airflow-init && \
+docker compose up
