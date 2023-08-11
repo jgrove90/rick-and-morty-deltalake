@@ -1,4 +1,4 @@
-<h1 align="center"> <img src="img/banner.png" alt="Mr.Grey" width="832" 
+<h1 align="center"> <img src="img/rnm_banner.jpg" width="832" 
      height="270"/></h1>
 
 <h1 align="center" style="color:#40A7FF;font-size:28px"><b>Rick and Morty ELT Pipeline</b></h1>
@@ -33,14 +33,14 @@ For data storage, I took a modern approach by implementing a Delta Lake using th
 
 In the transformation phase, I turned to the pandas library. This step involved shaping the extracted data into a more manageable format. Through a series of data cleaning, filtering, and structuring operations, I harnessed the flexibility of pandas DataFrames.
 
-Apache Airflow, played a pivotal role in orchestrating the entire process. Airflow enabled me to schedule and automate data extraction, transformation, and loading.
+Apache Airflow, played a role in orchestrating the entire process. Airflow enabled me to schedule and automate data extraction, transformation, and loading.
 
 Using Docker, I containerized the project. This step allowed me to encapsulate the entire workflow and its dependencies, making it easily portable across different environments. Containerization ensured consistency and eliminated potential compatibility issues, making deployment a breeze.
 
 In essence, this project showcases my ability to seamlessly gather, store, transform, and orchestrate data using a well-chosen set of tools. From extracting data through APIs to utilizing advanced storage techniques, employing data transformation libraries, orchestrating tasks with Airflow, and finally containerizing the project, every step reflects a strategic approach to building a robust and efficient data pipeline, even if only on a small scale.
 
 <h3 id="elt_diagram">ELT Diagram</h2>
-<h1 align="center"><img src="img/diagram.png"  width="832" 
+<h1 align="center"><img src="img/rnm_pipeline.png"  width="832" 
      height="270"/></h1>
 
 <h3>Key Technologies:</h3>
@@ -63,7 +63,6 @@ In essence, this project showcases my ability to seamlessly gather, store, trans
   <li>Postgres</li>
 </ul>
 
-
 <h2 id="installation">Installation</h2>
 
 1. Download [Docker Desktop](https://www.docker.com/products/docker-desktop/) and start docker
@@ -83,3 +82,23 @@ sh start.sh
 ```bash
 sh teardown.sh
 ```
+
+<h2 id="improvements">Improvements</h2>
+
+Data validation can be done prior to loading the delta tables at each layer of the pipeline. This data was very clean and only needed to perform simple transformations. As a proof of concept I might return to this project and include a framework like:
+<ul>
+  <li><a href="https://greatexpectations.io/gx-oss">Great Expectations</a></li>
+  <li><a href="https://docs.soda.io/soda-core/overview-main.html">Soda Core</a></li>
+  <li><a href="https://pandera.readthedocs.io/en/stable/">Pandera</a></li>
+</ul>
+
+I'd probably go with Soda Core or Pandera as they are lightweight frameworks compared to Great Expectations.
+
+
+Finally, a more indepth statistical analysis could be performed using: 
+
+<ul>
+  <li>Jupyter Lab</li>
+  <li>Dashboards (might revisit this and make it more visually appealing)</li>
+</ul>
+</p>
