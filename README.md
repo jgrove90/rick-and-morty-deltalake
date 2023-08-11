@@ -47,6 +47,7 @@ In essence, this project showcases my ability to seamlessly gather, store, trans
 
 <ul>
   <li>Python</li>
+  <li>Apache Airflow</li>
   <li>Delta-rs: Data storage layer with ACID transactions and versioning</li>
   <li>Docker: Containerization platform for easy deployment and reproducibility</li>
   <li>Tableau: Visual analytics platform</li>
