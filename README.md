@@ -12,15 +12,12 @@
   <a href="#installation">Installation</a> •
   <a href="https://public.tableau.com/app/profile/jared.grove/viz/RickandMorty_16915108970840/Dashboard1">Dashboard</a> •
   <a href="#elt_diagram">ELT Diagram</a> •
+  <a href="#airflow_graph">Airflow Graph</a> •
   <a href="#improvements">Improvements</a> 
 </p>
 
 <p align="center">
-<img src="img/dashboard_rnm.gif"></a>  
-</p>
-
-<p align="center">
-<img src="img/airflow_rnm.gif"></a>  
+<a href="https://public.tableau.com/app/profile/jared.grove/viz/RickandMorty_16915108970840/Dashboard1"><img src="img/dashboard_rnm.gif"></a>  
 </p>
 
 <h2 id="about">About</h2>
@@ -42,6 +39,12 @@ In essence, this project showcases my ability to seamlessly gather, store, trans
 <h3 id="elt_diagram">ELT Diagram</h2>
 <h1 align="center"><img src="img/rnm_pipeline.png"  width="832" 
      height="270"/></h1>
+
+<h3 id="airflow_graph">Airflow Graph</h2>
+<p align="center">
+<img src="img/airflow_rnm.gif"></a>  
+</p>
+
 
 <h3>Key Technologies:</h3>
 
